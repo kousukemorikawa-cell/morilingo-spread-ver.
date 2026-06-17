@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>モリリンゴ Clean Quest</title>
+<style>
+:root{--green:#2f8f57;--ink:#263238;--card:rgba(255,255,255,.92)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;background:linear-gradient(160deg,#dff7ff,#fff3c9);color:var(--ink)}
+.app{max-width:880px;margin:0 auto;min-height:100vh;padding:12px 12px 155px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.logo{font-size:24px;font-weight:1000;color:var(--green);text-shadow:0 2px 0 #fff}.pill{background:#fff;border-radius:999px;padding:8px 12px;font-weight:900;box-shadow:0 4px 14px #0001}
+.card{background:var(--card);border:2px solid #fff;border-radius:24px;padding:16px;box-shadow:0 16px 38px #24553625}
+.screen{display:none}.screen.active{display:block}
+button{font-family:inherit}.btn{border:0;border-radius:18px;padding:14px 16px;font-weight:1000;font-size:16px;background:#fff;box-shadow:0 6px 0 #0002,0 12px 22px #0001;cursor:pointer}.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #0002}.primary{background:linear-gradient(#8df08f,#32b85c);color:#fff}.secondary{background:linear-gradient(#ffe78f,#ffbd45);color:#553700}.ghost{background:#ffffffaa}
+.hero{text-align:center;padding:28px 10px}.big{font-size:72px}h1,h2,h3{margin:.35em 0}.muted{color:#667085;font-weight:800}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stageList{display:grid;gap:10px}.stage{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:#ffffffc9;border:2px solid #fff;border-radius:20px;padding:12px}.stageIcon{font-size:38px;text-align:center}.locked{filter:grayscale(1);opacity:.55}
+.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{background:#fff;border:2px solid #ecf1ee;border-radius:16px;padding:10px 12px;font-weight:900}
+.world{position:relative;height:310px;border-radius:28px;overflow:hidden;margin:10px 0;border:3px solid #fff;box-shadow:inset 0 -12px 0 #0001;background:linear-gradient(#9ee8ff 0 45%,#bdf2a1 45% 76%,#85d069 76%)}
+.world.tropical{background:linear-gradient(#8ce9ff 0 40%,#b9f271 40% 72%,#54c96d 72%)}.world.snow{background:linear-gradient(#cfeeff 0 42%,#fbfeff 42% 74%,#e3f4ff 74%)}.world.volcano{background:linear-gradient(#5b5465 0 42%,#8b5d43 42% 74%,#3d3037 74%)}.world.mars{background:linear-gradient(#f6a56d 0 42%,#d76b45 42% 76%,#b94835 76%)}.world.school{background:linear-gradient(#bcecff 0 42%,#99d874 42% 66%,#c4834c 66% 100%)}
+.stageCap{position:absolute;left:12px;top:12px;background:#ffffffb8;border-radius:999px;padding:7px 12px;font-weight:1000;z-index:4}.sun{position:absolute;right:24px;top:18px;font-size:42px}.cloud{position:absolute;font-size:36px;top:20px;left:12%;animation:float 8s infinite ease-in-out}.cloud.c2{left:70%;top:38px;animation-delay:-3s}.track{display:none;position:absolute;left:0;right:0;bottom:0;height:92px;background:repeating-linear-gradient(0deg,#bf6e44 0 18px,#c9784b 18px 22px)}.world.school .track{display:block}
+.treeArea{position:absolute;left:20px;right:20px;bottom:48px;display:flex;gap:14px;align-items:flex-end;min-height:205px;overflow:hidden}.obj{position:relative;width:140px;height:210px;flex:0 0 auto}.sapling{position:absolute;left:40px;bottom:0;font-size:64px}.trunk{position:absolute;left:57px;bottom:0;width:28px;height:78px;background:#8b552d;border-radius:12px}.crown{position:absolute;left:5px;bottom:54px;width:130px;height:130px;background:#4fb95e;border-radius:54% 46% 52% 48%;box-shadow:inset -12px -10px #0001,0 8px 0 #0001}.banana .crown{background:linear-gradient(145deg,#4fbd65,#2c9651);border-radius:56% 44% 45% 55%;transform:skewX(-5deg)}.fruit{position:absolute;font-size:23px;transform:translate(-50%,-50%);filter:drop-shadow(0 3px 1px #0002);animation:pop .25s}
+.snowBase,.snowHead{position:absolute;left:50%;transform:translateX(-50%);background:#fff;border:4px solid #dbeefd;border-radius:50%;box-shadow:inset -10px -10px #aadaf047,0 8px 0 #0001}.snowBase{bottom:0;width:92px;height:92px}.snowHead{bottom:75px;width:62px;height:62px}.snowArm{position:absolute;width:52px;height:8px;background:#8b552d;border-radius:999px;bottom:91px}.snowArm.r{left:96px;transform:rotate(-25deg)}.snowArm.l{left:5px;transform:rotate(25deg)}.snowFace{position:absolute;left:50%;bottom:103px;transform:translateX(-50%);font-size:20px;font-weight:900;letter-spacing:5px}.snowNose{position:absolute;left:78px;bottom:102px;font-size:21px}.snowStick{position:absolute;left:122px;bottom:80px;font-size:45px;transform:rotate(18deg)}
+.char{position:absolute;font-size:56px;bottom:78px;left:-90px;z-index:8;display:none;filter:drop-shadow(0 8px 4px #0003)}.ninjaRun{display:block;animation:ninja 4.2s ease-in-out forwards}.dragonFly{display:block;font-size:76px;bottom:165px;animation:dragon 5.2s ease-in-out forwards}
+.fireOverlay{display:none;position:absolute;inset:0;z-index:7;pointer-events:none;background:radial-gradient(circle at 25% 80%,#ffe65add 0 8%,#ff5f24cc 16%,transparent 32%),radial-gradient(circle at 62% 74%,#fff678dd 0 9%,#ff5220c7 18%,transparent 35%),linear-gradient(0deg,#ff4d28aa,#ff4d2820 58%,transparent);animation:burn 1.05s infinite}.fireOverlay.on{display:block}.world.shake{animation:shake .38s linear 6}
+.status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.stat{text-align:center;background:#ffffffb8;border-radius:16px;padding:9px;font-weight:1000}.timer{grid-column:1/-1;background:#ffffffb8;border-radius:18px;padding:10px 12px;font-weight:1000}.timerTop{display:flex;justify-content:space-between;margin-bottom:7px}.trackbar{height:16px;background:#edf2f0;border-radius:999px;overflow:hidden;border:2px solid #fff}.fill{height:100%;width:100%;background:linear-gradient(90deg,#40c96b,#f8d84a,#f27657);transition:width .25s linear}
+.question{background:#fff;border:3px solid #e9f4ee;border-radius:20px;padding:14px 16px;margin-top:12px;box-shadow:0 7px 0 #2f7d4b14;font-size:21px;font-weight:1000;line-height:1.5}.feedback{background:#ffffffaa;border-radius:16px;padding:8px 12px;margin-top:8px;min-height:38px;font-weight:1000}
+.answerPanel{position:fixed;left:0;right:0;bottom:0;background:#fffffff0;backdrop-filter:blur(10px);padding:12px 14px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 28px #0002;z-index:30}.answers{max-width:880px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}.ans{min-height:64px;text-align:left;border:4px solid transparent}.ans:before{content:attr(data-label);display:inline-grid;place-items:center;width:28px;height:28px;border-radius:999px;margin-right:8px;color:#fff}.red{border-color:#ef5350}.red:before{background:#ef5350}.blue{border-color:#42a5f5}.blue:before{background:#42a5f5}.green{border-color:#66bb6a}.green:before{background:#66bb6a}.yellow{border-color:#f6c945}.yellow:before{background:#f6c945;color:#5d4300}
+input,textarea,select{width:100%;border:2px solid #e6edf0;border-radius:14px;padding:12px;font-size:16px;background:#fff;font-family:inherit}textarea{min-height:92px}.form{display:grid;gap:10px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+@keyframes float{50%{transform:translateY(12px)}}@keyframes pop{from{transform:translate(-50%,-50%) scale(.1)}to{transform:translate(-50%,-50%) scale(1)}}@keyframes ninja{0%{left:-90px}45%{left:76px}58%{left:76px;transform:rotate(-8deg)}100%{left:105%}}@keyframes dragon{0%{left:105%;transform:scaleX(-1)}40%{left:62%;transform:scaleX(-1) translateY(18px)}58%{left:62%;transform:scaleX(-1) translateY(18px)}100%{left:-130px;transform:scaleX(-1) translateY(-20px)}}@keyframes burn{50%{opacity:.75;filter:saturate(1.3)}}@keyframes shake{25%{transform:translate(4px,-2px)}50%{transform:translate(-4px,2px)}75%{transform:translate(3px,2px)}}@media(max-width:560px){.app{padding:10px 10px 156px}.world{height:292px}.logo{font-size:20px}.question{font-size:18px}.stage{grid-template-columns:52px 1fr}.stage .btn{grid-column:1/-1}.status{grid-template-columns:repeat(3,1fr)}.obj{width:122px}.crown{width:112px;height:112px}.ans{font-size:16px;min-height:66px;padding:10px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header"><div class="logo">🌳 モリリンゴ</div><div class="pill" id="savePill">保存済み</div></div>
+  <section id="home" class="screen active"><div class="card hero"><div class="big">🌱🍎</div><h1>古典文法の森を育てよう</h1><p class="muted">公式20ステージは順番に開放。自作問題はオリジナルで遊べます。</p><button class="btn primary" onclick="showProfile()">はじめる</button></div></section>
+  <section id="profile" class="screen"><div class="card"><h2>プレイヤー登録</h2><p class="muted">結果をスプレッドシートに記録するために入力します。端末に保存されます。</p><div class="form"><input id="playerName" placeholder="名前（例：森川太郎）"><input id="playerClass" placeholder="クラス（例：1-3）"><input id="playerNumber" placeholder="出席番号（例：12）" inputmode="numeric"></div><div class="toolbar"><button class="btn primary" onclick="saveProfileAndMenu()">保存して進む</button><button class="btn ghost" onclick="show('home')">戻る</button></div></div></section>
+  <section id="menu" class="screen"><div class="card"><h2>メニュー</h2><p class="muted" id="playerDisplay"></p><div class="grid2"><button class="btn primary" onclick="openChallenge()">チャレンジ</button><button class="btn secondary" onclick="show('original')">オリジナル</button></div><h3>称号</h3><div id="badges" class="badges"></div><div class="toolbar"><button class="btn ghost" onclick="resetAll()">進捗リセット</button></div></div></section>
+  <section id="challenge" class="screen"><div class="card"><h2>チャレンジ</h2><p class="muted">ステージをクリアすると次が開放されます。</p><div id="stageList" class="stageList"></div><div class="toolbar"><button class="btn ghost" onclick="show('menu')">戻る</button></div></div></section>
+  <section id="original" class="screen"><div class="card"><h2>オリジナル</h2><p class="muted">自作問題で遊ぶ場所。背景は学校のグラウンドです。</p><div class="toolbar"><button class="btn primary" onclick="startOriginal()">オリジナルで遊ぶ</button><button class="btn secondary" onclick="show('editor')">問題を作る</button><button class="btn ghost" onclick="show('menu')">戻る</button></div></div></section>
+  <section id="editor" class="screen"><div class="card"><h2>問題作成</h2><p class="muted">Excelやスプレッドシートで作った表をCSVで読み込めます。正解番号は1〜4で入力してください。</p><div class="form"><textarea id="csvBox" placeholder="問題文,選択肢1,選択肢2,選択肢3,選択肢4,正解番号
+書くの未然形は？,書か,書き,書く,書け,1
+けりの接続は？,未然形,連用形,終止形,連体形,2"></textarea><input type="file" id="csvFile" accept=".csv,text/csv"></div><div class="toolbar"><button class="btn primary" onclick="importCSVFromText()">CSVを読み込み</button><button class="btn secondary" onclick="loadCSVFile()">CSVファイル読み込み</button><button class="btn secondary" onclick="exportCSV()">CSVを書き出し</button><button class="btn ghost" onclick="clearOriginalQuestions()">自作問題を空にする</button><button class="btn ghost" onclick="show('original')">戻る</button></div></div></section>
+  <section id="game" class="screen"><div class="card"><h2 id="modeTitle">ステージ</h2><div class="status"><div class="stat">点 <span id="score">0</span></div><div class="stat">連続 <span id="streak">0</span></div><div class="stat">ミス <span id="miss">0</span>/3</div><div class="timer"><div class="timerTop"><span>残り時間</span><span><span id="time">20</span>秒</span></div><div class="trackbar"><div id="timeFill" class="fill"></div></div></div></div><div id="world" class="world"><div id="stageCap" class="stageCap">田園</div><div id="sun" class="sun">☀️</div><div class="cloud">☁️</div><div class="cloud c2">☁️</div><div class="track"></div><div id="treeArea" class="treeArea"></div><div id="ninja" class="char">🥷</div><div id="dragon" class="char">🐉</div><div id="fireOverlay" class="fireOverlay"></div></div><div id="question" class="question">問題</div><div id="feedback" class="feedback"></div><div class="toolbar"><button class="btn ghost" onclick="quit()">メニューへ</button></div></div></section>
+</div>
+<div id="answerPanel" class="answerPanel" style="display:none"><div id="answers" class="answers"></div></div>
+<script>
+const $=id=>document.getElementById(id);
+
+// Google Apps ScriptのウェブアプリURLをここに貼る
+// 例：https://script.google.com/macros/s/xxxxxxxxxxxxxxxx/exec
+const GAS_URL="https://script.google.com/macros/s/AKfycbxgLvbODQ4cBgBVN4qerWQ_zO0M-bGIu3BkKP6QlFsdTYVCnNLBJPd_E4JQKxEgoHzc3A/exec";
+
+/*
+============================================================
+【開発者用：ステージ設定】
+clear はクリアに必要な正解数。
+unit は tree / banana / snowman。
+============================================================
+*/
+const STAGES=[
+ {id:'field',name:'ステージ1「田園」',icon:'🌾',cls:'',sun:'☀️',clear:7,plant:'apple',growName:'リンゴ',unit:'tree'},
+ {id:'subtropical',name:'ステージ2「亜熱帯」',icon:'🌴',cls:'tropical',sun:'🌞',clear:7,plant:'banana',growName:'バナナ',unit:'banana'},
+ {id:'snow',name:'ステージ3「雪山」',icon:'🏔️',cls:'snow',sun:'❄️',clear:7,plant:'snowman',growName:'雪だるま',unit:'snowman'},
+ {id:'volcano',name:'ステージ4「火山」',icon:'🌋',cls:'volcano',sun:'🌋',clear:7,plant:'gem',growName:'火の実',unit:'tree'},
+ {id:'mars',name:'ステージ5「火星」',icon:'🪐',cls:'mars',sun:'🛸',clear:7,plant:'star',growName:'星の実',unit:'tree'},
+ {id:'forest',name:'ステージ6「深い森」',icon:'🌲',cls:'',sun:'🌤️',clear:7,plant:'apple',growName:'森の実',unit:'tree'},
+ {id:'river',name:'ステージ7「川辺」',icon:'🏞️',cls:'',sun:'💧',clear:7,plant:'apple',growName:'水の実',unit:'tree'},
+ {id:'desert',name:'ステージ8「砂漠」',icon:'🏜️',cls:'mars',sun:'☀️',clear:7,plant:'star',growName:'サボテンの実',unit:'tree'},
+ {id:'castle',name:'ステージ9「古城」',icon:'🏰',cls:'volcano',sun:'🌙',clear:7,plant:'gem',growName:'宝石',unit:'tree'},
+ {id:'sky',name:'ステージ10「空島」',icon:'☁️',cls:'snow',sun:'🌈',clear:7,plant:'star',growName:'雲の実',unit:'tree'},
+ {id:'bamboo',name:'ステージ11「竹林」',icon:'🎋',cls:'tropical',sun:'🎋',clear:7,plant:'banana',growName:'竹の実',unit:'banana'},
+ {id:'moon',name:'ステージ12「月面」',icon:'🌕',cls:'mars',sun:'🌕',clear:7,plant:'star',growName:'月の石',unit:'tree'},
+ {id:'sea',name:'ステージ13「海辺」',icon:'🏖️',cls:'tropical',sun:'🌊',clear:7,plant:'banana',growName:'南国の実',unit:'banana'},
+ {id:'cave',name:'ステージ14「洞窟」',icon:'🕳️',cls:'volcano',sun:'💎',clear:7,plant:'gem',growName:'鉱石',unit:'tree'},
+ {id:'library',name:'ステージ15「図書館」',icon:'📚',cls:'school',sun:'📖',clear:7,plant:'apple',growName:'知恵の実',unit:'tree'},
+ {id:'dojo',name:'ステージ16「道場」',icon:'🥋',cls:'school',sun:'🥷',clear:7,plant:'apple',growName:'修行の実',unit:'tree'},
+ {id:'aurora',name:'ステージ17「オーロラ」',icon:'🌌',cls:'snow',sun:'🌌',clear:7,plant:'snowman',growName:'氷像',unit:'snowman'},
+ {id:'factory',name:'ステージ18「からくり工場」',icon:'⚙️',cls:'volcano',sun:'⚙️',clear:7,plant:'gem',growName:'歯車の実',unit:'tree'},
+ {id:'temple',name:'ステージ19「古文神殿」',icon:'⛩️',cls:'',sun:'⛩️',clear:7,plant:'apple',growName:'神木の実',unit:'tree'},
+ {id:'galaxy',name:'ステージ20「銀河」',icon:'🌌',cls:'mars',sun:'🛸',clear:7,plant:'star',growName:'銀河の星',unit:'tree'}
+];
+
+/*
+============================================================
+【開発者用：問題を増やす場所】
+q = 問題文
+a = 選択肢4つ
+c = 正解番号。0が1つ目、1が2つ目、2が3つ目、3が4つ目
+============================================================
+*/
+const QUESTION_BANK={
+ basic:[
+  {q:"『書く』の未然形は？",a:["書か","書き","書く","書け"],c:0},
+  {q:"『書く』の連用形は？",a:["書か","書き","書く","書け"],c:1},
+  {q:"『読む』の已然形は？",a:["読ま","読み","読む","読め"],c:3},
+  {q:"『ず』に接続する活用形は？",a:["未然形","連用形","終止形","已然形"],c:0},
+  {q:"『けり』に接続する活用形は？",a:["未然形","連用形","連体形","命令形"],c:1},
+  {q:"『む』に接続する活用形は？",a:["未然形","連用形","終止形","已然形"],c:0},
+  {q:"『念ず』の活用の種類は？",a:["四段活用","上一段活用","サ行変格活用","ナ行変格活用"],c:2},
+  {q:"『来』の活用の種類は？",a:["カ行変格活用","サ行変格活用","ラ行変格活用","四段活用"],c:0},
+  {q:"係助詞『ぞ』の結びは？",a:["連体形","已然形","命令形","未然形"],c:0},
+  {q:"係助詞『こそ』の結びは？",a:["連体形","已然形","終止形","未然形"],c:1}
+ ],
+ level2:[
+  {q:"『食ぶ』の活用の種類は？",a:["四段","下二段","上一段","サ変"],c:1},
+  {q:"『見る』の活用の種類は？",a:["上一段","下一段","四段","カ変"],c:0}
+ ],
+ level3:[
+  {q:"『あり』の活用の種類は？",a:["四段","ラ変","ナ変","サ変"],c:1},
+  {q:"ラ変型活用の終止形は？",a:["る","り","れ","ら"],c:1}
+ ],
+ level4:[
+  {q:"『死ぬ』の活用の種類は？",a:["四段","ナ変","ラ変","下二段"],c:1},
+  {q:"『す』の活用の種類は？",a:["サ変","カ変","四段","上一段"],c:0}
+ ],
+ level5:[
+  {q:"『べし』の接続は？",a:["未然形","連用形","終止形","已然形"],c:2},
+  {q:"『らむ』の接続は？",a:["未然形","連用形","終止形","命令形"],c:2}
+ ]
+};
+
+function stageQuestions(stageIndex){
+ const source=remoteQuestions||QUESTION_BANK;
+ const stage=STAGES[stageIndex];
+ let qs=[...(source.basic||[])];
+ if(stageIndex>=1)qs=qs.concat(source.level2||[]);
+ if(stageIndex>=2)qs=qs.concat(source.level3||[]);
+ if(stageIndex>=3)qs=qs.concat(source.level4||[]);
+ if(stageIndex>=4)qs=qs.concat(source.level5||[]);
+ // stage列に field / snow などステージIDを書いた専用問題も追加できる
+ if(stage && source[stage.id])qs=qs.concat(source[stage.id]);
+ // シート読み込みに失敗した時や空欄時は内蔵問題に戻す
+ if(!qs.length && source!==QUESTION_BANK)return stageQuestionsFallback(stageIndex);
+ return qs;
+}
+function stageQuestionsFallback(stageIndex){
+ let qs=[...QUESTION_BANK.basic];
+ if(stageIndex>=1)qs=qs.concat(QUESTION_BANK.level2);
+ if(stageIndex>=2)qs=qs.concat(QUESTION_BANK.level3);
+ if(stageIndex>=3)qs=qs.concat(QUESTION_BANK.level4);
+ if(stageIndex>=4)qs=qs.concat(QUESTION_BANK.level5);
+ return qs;
+}
+
+const FRUITS={apple:"🍎",banana:"🍌",gem:"🔴",star:"⭐"};
+const POS7=[[50,22],[36,43],[64,43],[28,65],[50,65],[72,65],[50,84]];
+let state=JSON.parse(localStorage.getItem("morilingoCleanQuest")||"{}");
+state.unlocked??=1;state.badges??=[];state.original??=[];state.player??={name:"",className:"",number:""};
+let remoteQuestions=null;
+let game=null;
+let timerId=null;
+let nextId=null;
+let canAnswer=false;
+
+function save(){localStorage.setItem("morilingoCleanQuest",JSON.stringify(state));$("savePill").textContent="保存済み";}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active");$("answerPanel").style.display=id==="game"?"block":"none";renderBadges();updatePlayerDisplay();}
+
+function showProfile(){
+ $("playerName").value=state.player.name||"";
+ $("playerClass").value=state.player.className||"";
+ $("playerNumber").value=state.player.number||"";
+ show("profile");
+}
+function saveProfileAndMenu(){
+ state.player={
+  name:$("playerName").value.trim(),
+  className:$("playerClass").value.trim(),
+  number:$("playerNumber").value.trim()
+ };
+ if(!state.player.name){alert("名前を入力してください");return;}
+ save();
+ loadRemoteQuestions();
+ show("menu");
+}
+function updatePlayerDisplay(){
+ if(!$("playerDisplay"))return;
+ const p=state.player||{};
+ $("playerDisplay").textContent=p.name?`プレイヤー：${p.className||"クラス未入力"} ${p.number? p.number+"番 " : ""}${p.name}`:"プレイヤー未登録";
+}
+function loadRemoteQuestions(){
+ if(!GAS_URL)return;
+ const callback="morilingoQuestionsCallback_"+Date.now();
+ window[callback]=data=>{
+  try{
+   if(data && data.questions){remoteQuestions=data.questions;$("savePill").textContent="問題読込済み";}
+  }finally{delete window[callback];script.remove();}
+ };
+ const script=document.createElement("script");
+ script.src=GAS_URL+`?action=questions&callback=${callback}&v=${Date.now()}`;
+ script.onerror=()=>{$("savePill").textContent="問題読込失敗";delete window[callback];script.remove();};
+ document.body.appendChild(script);
+}
+function submitResult(reason="clear"){
+ if(!GAS_URL||!game)return;
+ const p=state.player||{};
+ const data=new URLSearchParams({
+  action:"result",
+  name:p.name||"",
+  className:p.className||"",
+  number:p.number||"",
+  mode:game.mode||"",
+  stageId:game.stage?.id||"",
+  stageName:game.stage?.name||"",
+  score:String(game.score||0),
+  correctCount:String(game.correctCount||0),
+  answeredCount:String(Math.max(0,(game.qIndex||1)-1)),
+  miss:String(game.miss||0),
+  reason
+ });
+ fetch(GAS_URL,{method:"POST",mode:"no-cors",body:data}).then(()=>{$("savePill").textContent="結果送信済み";}).catch(()=>{$("savePill").textContent="結果未送信";});
+}
+
+function renderBadges(){const names=[["first","はじめの一歩"],["field","田園の守り人"],["subtropical","亜熱帯探検家"],["snow","雪だるま職人"],["volcano","火山突破者"],["mars","火星の古典王"]];$("badges").innerHTML=names.map(([id,n])=>`<div class="badge">${state.badges.includes(id)?"🏅":"🔒"} ${n}</div>`).join("");}
+function addBadge(id){if(!state.badges.includes(id)){state.badges.push(id);save();}}
+function openChallenge(){renderStages();show("challenge");}
+function renderStages(){
+ $("stageList").innerHTML=STAGES.map((s,i)=>{
+  const open=i<state.unlocked;
+  return `<div class="stage ${open?"":"locked"}"><div class="stageIcon">${open?s.icon:"🔒"}</div><div><h3>${s.name}</h3><div class="muted">クリア条件：${s.clear}問正解</div></div><button class="btn ${open?"primary":"ghost"}" ${open?`onclick="startChallenge(${i})"`:"disabled"}>${open?"挑戦":"未開放"}</button></div>`;
+ }).join("");
+}
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
+
+function startChallenge(i){
+ const s=STAGES[i];
+ game={mode:"challenge",stageIndex:i,stage:s,score:0,streak:0,miss:0,time:20,qIndex:0,correctCount:0,objects:[0],unit:s.unit,plant:s.plant,questions:shuffle(stageQuestions(i))};
+ setupWorld(s.cls,s.sun,s.name);
+ $("modeTitle").textContent=s.name;
+ startGame();
+}
+function startOriginal(){
+ const qs=state.original.length?state.original:QUESTION_BANK.basic.slice(0,4);
+ const s={name:"オリジナル「学校のグラウンド」",cls:"school",sun:"🏫",unit:"tree",plant:"apple",growName:"リンゴ",clear:999,id:"original"};
+ game={mode:"original",stageIndex:-1,stage:s,score:0,streak:0,miss:0,time:20,qIndex:0,correctCount:0,objects:[0],unit:s.unit,plant:s.plant,questions:shuffle(qs)};
+ setupWorld(s.cls,s.sun,"オリジナル");
+ $("modeTitle").textContent=s.name;
+ startGame();
+}
+function setupWorld(cls,sun,label){$("world").className="world "+cls;$("sun").textContent=sun;$("stageCap").textContent=label;}
+function startGame(){show("game");addBadge("first");renderObjects();updateStats();nextQuestion();}
+function quit(){if(game)submitResult("quit");stopTimer();clearTimeout(nextId);show("menu");}
+
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
+function scheduleNext(ms=850){clearTimeout(nextId);nextId=setTimeout(nextQuestion,ms);}
+function nextQuestion(){
+ stopTimer();clearTimeout(nextId);canAnswer=true;
+ game.time=20;
+ const q=game.questions[game.qIndex % game.questions.length];
+ game.qIndex++;
+ game.current=q;
+ $("question").textContent=q.q;
+ $("feedback").textContent="";
+ const colors=["red","blue","green","yellow"], labels=["A","B","C","D"];
+ $("answers").innerHTML=q.a.map((x,i)=>`<button class="btn ans ${colors[i]}" data-label="${labels[i]}" onclick="answer(${i})">${x}</button>`).join("");
+ updateStats();
+ timerId=setInterval(()=>{game.time--;updateStats();if(game.time<=0)answer(-1);},1000);
+}
+function answer(i){
+ if(!canAnswer)return;
+ canAnswer=false;
+ stopTimer();
+ const ok=i===game.current.c;
+ if(ok){
+  game.score+=game.time>=15?15:10;
+  game.streak++;
+  game.correctCount++;
+  game.miss=0;
+  $("feedback").textContent=growMessage();
+  growObject();
+  updateStats();
+  if(checkClear())return;
+  scheduleNext(850);
+ }else{
+  game.score=Math.max(0,game.score-5);
+  game.streak=0;
+  game.miss++;
+  $("feedback").textContent=i<0?"時間切れ！":"おしい！";
+  updateStats();
+  if(game.miss>=3) setTimeout(dragonEvent,400);
+  else setTimeout(ninjaEvent,400);
+ }
+}
+function checkClear(){
+ if(game.mode!=="challenge")return false;
+ if(game.correctCount<game.stage.clear)return false;
+ addBadge(game.stage.id);
+ if(state.unlocked<game.stageIndex+2 && game.stageIndex<STAGES.length-1)state.unlocked=game.stageIndex+2;
+ save();
+ submitResult("clear");
+ $("feedback").textContent=`${game.stage.name}クリア！ 次のステージが開放！`;
+ stopTimer();canAnswer=false;
+ setTimeout(openChallenge,1500);
+ return true;
+}
+function updateStats(){
+ $("score").textContent=game?game.score:0;
+ $("streak").textContent=game?game.streak:0;
+ $("miss").textContent=game?game.miss:0;
+ $("time").textContent=game?game.time:20;
+ $("timeFill").style.width=(game?Math.max(0,game.time/20*100):100)+"%";
+}
+
+function renderObjects(){ $("treeArea").innerHTML=game.objects.map((n,idx)=>renderObject(n,idx)).join(""); }
+function renderObject(n,idx){
+ if(n===0 && idx===game.objects.length-1){
+  if(game.unit==="snowman")return `<div class="obj"><div class="sapling">❄️</div></div>`;
+  return `<div class="obj ${game.unit==="banana"?"banana":""}"><div class="sapling">🌱</div></div>`;
+ }
+ if(game.unit==="snowman")return renderSnowman(n);
+ const fruits=POS7.slice(0,n).map(([x,y])=>`<span class="fruit" style="left:${x}%;top:${y}%">${FRUITS[game.plant]||"🍎"}</span>`).join("");
+ return `<div class="obj ${game.unit==="banana"?"banana":""}"><div class="crown">${fruits}</div><div class="trunk"></div></div>`;
+}
+function renderSnowman(n){
+ let parts="";
+ if(n>=1)parts+=`<div class="snowBase"></div>`;
+ if(n>=2)parts+=`<div class="snowHead"></div>`;
+ if(n>=3)parts+=`<div class="snowArm r"></div>`;
+ if(n>=4)parts+=`<div class="snowArm l"></div>`;
+ if(n>=5)parts+=`<div class="snowFace">●●<br>⌣</div>`;
+ if(n>=6)parts+=`<div class="snowNose">🥕</div>`;
+ if(n>=7)parts+=`<div class="snowStick">🪄</div>`;
+ return `<div class="obj">${parts}</div>`;
+}
+function growObject(){
+ let last=game.objects.length-1;
+ if(game.objects[last]<7)game.objects[last]++;
+ else game.objects.push(1);
+ renderObjects();
+}
+function hasAnyObject(){return game.objects.some(n=>n>0);}
+function stealObject(){
+ for(let i=game.objects.length-1;i>=0;i--){if(game.objects[i]>0){game.objects[i]--;break;}}
+ while(game.objects.length>1 && game.objects[game.objects.length-1]===0 && game.objects[game.objects.length-2]===0)game.objects.pop();
+ renderObjects();
+}
+function clearObjects(){game.objects=[0];renderObjects();}
+function growMessage(){
+ if(game.unit==="snowman"){
+  const next=(game.objects[game.objects.length-1]||0)+1;
+  return ["大きい雪玉ができた！","頭の雪玉がのった！","右手が生えた！","左手が生えた！","顔ができた！","にんじん鼻がついた！","ステッキを持った！"][(next-1)%7];
+ }
+ if(game.unit==="banana")return "正解！ バナナがなった！";
+ return `正解！ ${game.stage.growName||"実"}がなった！`;
+}
+function stealMessage(){
+ if(!hasAnyObject())return "忍者は取るものがなく、悲しそうに帰っていった……";
+ if(game.unit==="snowman")return "忍者が雪だるまのパーツを1つ盗んだ！";
+ if(game.unit==="banana")return "忍者がバナナを1本盗んだ！";
+ return `忍者が${game.stage.growName||"実"}を1つ盗んだ！`;
+}
+function dragonMessage(){
+ if(game.unit==="snowman")return "ドラゴン襲来！熱風で雪だるまが溶けた！";
+ if(game.unit==="banana")return "ドラゴン襲来！バナナが全部こげた！";
+ return `ドラゴン襲来！${game.stage.growName||"実"}が全没収！`;
+}
+function ninjaEvent(){
+ const has=hasAnyObject();
+ $("ninja").className="char ninjaRun";
+ $("feedback").textContent=stealMessage();
+ if(has)setTimeout(stealObject,2350);
+ setTimeout(()=>{$("ninja").className="char";scheduleNext(0);},4300);
+}
+function dragonEvent(){
+ game.miss=0;updateStats();
+ $("dragon").className="char dragonFly";
+ $("feedback").textContent=dragonMessage();
+ setTimeout(()=>{$("fireOverlay").classList.add("on");$("world").classList.add("shake");},2100);
+ setTimeout(clearObjects,3200);
+ setTimeout(()=>{$("fireOverlay").classList.remove("on");$("world").classList.remove("shake");$("dragon").className="char";scheduleNext(0);},5600);
+}
+function parseCSV(text){
+ const rows=[];
+ let row=[],cell="",inQuotes=false;
+ text=String(text||"").replace(/^\uFEFF/,"");
+ for(let i=0;i<text.length;i++){
+  const ch=text[i],next=text[i+1];
+  if(ch==='"'){
+   if(inQuotes && next==='"'){cell+='"';i++;}
+   else inQuotes=!inQuotes;
+  }else if(ch===',' && !inQuotes){
+   row.push(cell.trim());cell="";
+  }else if((ch==='\n'||ch==='\r') && !inQuotes){
+   if(ch==='\r' && next==='\n')i++;
+   row.push(cell.trim());
+   if(row.some(x=>x!==""))rows.push(row);
+   row=[];cell="";
+  }else{
+   cell+=ch;
+  }
+ }
+ row.push(cell.trim());
+ if(row.some(x=>x!==""))rows.push(row);
+ return rows;
+}
+function csvEscape(value){
+ value=String(value??"");
+ if(/[",\n\r]/.test(value))return '"'+value.replace(/"/g,'""')+'"';
+ return value;
+}
+function rowsToQuestions(rows){
+ if(rows.length && rows[0].join(",").includes("問題文"))rows=rows.slice(1);
+ const questions=[];
+ const errors=[];
+ rows.forEach((r,idx)=>{
+  if(r.length<6){errors.push(`${idx+1}行目：列が足りません`);return;}
+  const q=r[0];
+  const a=[r[1],r[2],r[3],r[4]];
+  const c=Number(r[5])-1;
+  if(!q||a.some(x=>!x)||!Number.isInteger(c)||c<0||c>3){errors.push(`${idx+1}行目：内容か正解番号を確認してください`);return;}
+  questions.push({q,a,c});
+ });
+ return {questions,errors};
+}
+function importCSVFromText(){
+ const text=$("csvBox").value;
+ const {questions,errors}=rowsToQuestions(parseCSV(text));
+ if(!questions.length){alert("読み込める問題がありません。CSVの形を確認してください。");return;}
+ state.original=questions;
+ save();
+ alert(`${questions.length}問を読み込みました${errors.length?`\n※${errors.length}行は読み込めませんでした`:""}`);
+}
+function loadCSVFile(){
+ const file=$("csvFile").files[0];
+ if(!file){alert("CSVファイルを選んでください");return;}
+ const reader=new FileReader();
+ reader.onload=()=>{
+  $("csvBox").value=reader.result;
+  importCSVFromText();
+ };
+ reader.readAsText(file,"UTF-8");
+}
+function exportCSV(){
+ const header=["問題文","選択肢1","選択肢2","選択肢3","選択肢4","正解番号"];
+ const rows=state.original.map(x=>[x.q,x.a[0],x.a[1],x.a[2],x.a[3],x.c+1]);
+ $("csvBox").value=[header,...rows].map(r=>r.map(csvEscape).join(",")).join("\n");
+}
+function clearOriginalQuestions(){
+ if(confirm("自作問題をすべて空にしますか？")){
+  state.original=[];save();$("csvBox").value="";alert("自作問題を空にしました");
+ }
+}
+function resetAll(){if(confirm("進捗をリセットしますか？")){localStorage.removeItem("morilingoCleanQuest");location.reload();}}
+renderBadges();updatePlayerDisplay();loadRemoteQuestions();save();
+</script>
+</body>
+</html>
