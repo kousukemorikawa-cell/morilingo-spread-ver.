@@ -225,7 +225,7 @@ function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).ma
 function startChallenge(i){
  const s=STAGES[i];
  game={mode:"challenge",stageIndex:i,stage:s,score:0,streak:0,miss:0,time:20,qIndex:0,correctCount:0,objects:[0],unit:s.unit,plant:s.plant,questions:shuffle(stageQuestions(i))};
- setupWorld(s.cls,s.sun,s.name);
+ setupWorld(s.cls,s.sun,s.name,s.image);
  $("modeTitle").textContent=s.name;
  startGame();
 }
@@ -237,7 +237,15 @@ function startOriginal(){
  $("modeTitle").textContent=s.name;
  startGame();
 }
-function setupWorld(cls,sun,label){$("world").className="world "+cls;$("sun").textContent=sun;$("stageCap").textContent=label;}
+function setupWorld(cls,sun,label,image){
+ $("world").className="world "+cls;
+ $("sun").textContent=sun;
+ $("stageCap").textContent=label;
+
+ if(image){
+   $("world").style.backgroundImage=`url('${image}')`;
+ }
+}
 function startGame(){show("game");addBadge("first");renderObjects();updateStats();nextQuestion();}
 function quit(){if(game)submitResult("quit");stopTimer();clearTimeout(nextId);show("menu");}
 
