@@ -29,9 +29,33 @@ button{font-family:inherit}.btn{border:0;border-radius:18px;padding:14px 16px;fo
 .answerPanel{position:fixed;left:0;right:0;bottom:0;background:#fffffff0;backdrop-filter:blur(10px);padding:12px 14px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 28px #0002;z-index:30}.answers{max-width:880px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:10px}.ans{min-height:64px;text-align:left;border:4px solid transparent}.ans:before{content:attr(data-label);display:inline-grid;place-items:center;width:28px;height:28px;border-radius:999px;margin-right:8px;color:#fff}.red{border-color:#ef5350}.red:before{background:#ef5350}.blue{border-color:#42a5f5}.blue:before{background:#42a5f5}.green{border-color:#66bb6a}.green:before{background:#66bb6a}.yellow{border-color:#f6c945}.yellow:before{background:#f6c945;color:#5d4300}
 input,textarea,select{width:100%;border:2px solid #e6edf0;border-radius:14px;padding:12px;font-size:16px;background:#fff;font-family:inherit}textarea{min-height:92px}.form{display:grid;gap:10px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 @keyframes float{50%{transform:translateY(12px)}}@keyframes pop{from{transform:translate(-50%,-50%) scale(.1)}to{transform:translate(-50%,-50%) scale(1)}}@keyframes ninja{0%{left:-90px}45%{left:76px}58%{left:76px;transform:rotate(-8deg)}100%{left:105%}}@keyframes dragon{0%{left:105%;transform:scaleX(-1)}40%{left:62%;transform:scaleX(-1) translateY(18px)}58%{left:62%;transform:scaleX(-1) translateY(18px)}100%{left:-130px;transform:scaleX(-1) translateY(-20px)}}@keyframes burn{50%{opacity:.75;filter:saturate(1.3)}}@keyframes shake{25%{transform:translate(4px,-2px)}50%{transform:translate(-4px,2px)}75%{transform:translate(3px,2px)}}@media(max-width:560px){.app{padding:10px 10px 156px}.world{height:292px}.logo{font-size:20px}.question{font-size:18px}.stage{grid-template-columns:52px 1fr}.stage .btn{grid-column:1/-1}.status{grid-template-columns:repeat(3,1fr)}.obj{width:122px}.crown{width:112px;height:112px}.ans{font-size:16px;min-height:66px;padding:10px}}
+
+/* 右上ポイント表示 */
+#scoreHud{
+ position:fixed;
+ top:12px;
+ right:12px;
+ z-index:99999;
+ display:none;
+ align-items:center;
+ gap:6px;
+ background:linear-gradient(#fff7c2,#ffd54f);
+ color:#553700;
+ font-weight:1000;
+ font-size:22px;
+ padding:10px 16px;
+ border-radius:999px;
+ box-shadow:0 4px 12px rgba(0,0,0,.2);
+ border:3px solid #fff;
+ pointer-events:none;
+}
+#scoreHud span{font-size:28px;line-height:1}
+@media(max-width:560px){#scoreHud{top:8px;right:8px;font-size:18px;padding:8px 13px}#scoreHud span{font-size:24px}}
+
 </style>
 </head>
 <body>
+<div id="scoreHud">🍎 <span id="scoreHudValue">0</span> pt</div>
 <div class="app">
   <div class="header"><div class="logo">🌳 モリリンゴ</div><div class="pill" id="savePill">保存済み</div></div>
   <section id="home" class="screen active"><div class="card hero"><div class="big">🌱🍎</div><h1>古典文法の森を育てよう</h1><p class="muted">公式20ステージは順番に開放。自作問題はオリジナルで遊べます。</p><button class="btn primary" onclick="showProfile()">はじめる</button></div></section>
@@ -154,7 +178,14 @@ let nextId=null;
 let canAnswer=false;
 
 function save(){localStorage.setItem("morilingoCleanQuest",JSON.stringify(state));$("savePill").textContent="保存済み";}
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));$(id).classList.add("active");$("answerPanel").style.display=id==="game"?"block":"none";renderBadges();updatePlayerDisplay();}
+function show(id){
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ $(id).classList.add("active");
+ $("answerPanel").style.display=id==="game"?"block":"none";
+ $("scoreHud").style.display=id==="game"?"flex":"none";
+ renderBadges();
+ updatePlayerDisplay();
+}
 
 function showProfile(){
  $("playerName").value=state.player.name||"";
@@ -302,7 +333,9 @@ function checkClear(){
  return true;
 }
 function updateStats(){
- $("score").textContent=game?game.score:0;
+ const point=game?game.score:0;
+ $("score").textContent=point;
+ $("scoreHudValue").textContent=point;
  $("streak").textContent=game?game.streak:0;
  $("miss").textContent=game?game.miss:0;
  $("time").textContent=game?game.time:20;
